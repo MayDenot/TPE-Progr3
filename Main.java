@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-import java.util.List;
 
 public class Main {
   private static final String ARCHIVO_ENTRADA = "Input.txt";
@@ -22,29 +21,23 @@ public class Main {
     for (Maquina maquina : datos.getMaquinas()) {
       System.out.println("  " + maquina);
     }
+    System.out.println();
   }
 
   public static void ejecutarAlgoritmos(LectorDatos datos) {
     BackTracking back = new BackTracking(datos.getTotalPiezas());
     System.out.println("Backtracking");
-    System.out.println(back.backTracking(datos.getMaquinas()));
-    // FALTA ESTO
-    // Solución obtenida: secuencia de máquinas.
-    // Solución obtenida: cantidad de piezas producidas y cantidad de puestas en funcionamiento
-    // requeridas.
-    // Métrica para analizar el costo de la solución (cantidad de estados generados)
+    Solucion solucionBack = back.backTracking(datos.getMaquinas());
+    System.out.println(solucionBack);
+    System.out.println();
 
     Greedy greedy = new Greedy(datos.getTotalPiezas());
-    System.out.println("Greedy"); // Crear clase Solucion
-    List<Maquina> solucionGreedy = greedy.greedy(datos.getMaquinas());
+    System.out.println("Greedy");
+    Solucion solucionGreedy = greedy.greedy(datos.getMaquinas());
     if (solucionGreedy != null) {
-      System.out.println("Solución obtenida: " + solucionGreedy);
+      System.out.println(solucionGreedy);
     } else {
       System.out.println("No hay solución posible");
     }
-    // FALTA ESTO
-    // Solución obtenida: cantidad de piezas producidas y cantidad de puestas en funcionamiento
-    // requeridas.
-    // Métrica para analizar el costo de la solución (cantidad de candidatos considerados)
   }
 }

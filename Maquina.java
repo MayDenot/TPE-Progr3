@@ -1,4 +1,4 @@
-public class Maquina {
+public class Maquina implements Comparable<Maquina> {
   private String nombre;
   private Integer capacidad;
 
@@ -25,6 +25,11 @@ public class Maquina {
 
   @Override
   public String toString() {
-    return "Maquina {" + "Nombre='" + nombre + ", Capacidad=" + capacidad + '}';
+    return nombre;
+  }
+
+  @Override
+  public int compareTo(Maquina o) {
+    return this.getCapacidad().compareTo(o.getCapacidad());
   }
 }

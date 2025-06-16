@@ -1,11 +1,11 @@
 import java.util.ArrayList;
 
 public class Greedy {
-  private ArrayList<Maquina> S;
+  private Solucion solucion;
   private Integer totalPiezasAFabricar;
 
   public Greedy(Integer totalPiezasAFabricar) {
-    this.S = new ArrayList<>();
+    this.solucion = new Solucion();
     this.totalPiezasAFabricar = totalPiezasAFabricar;
   }
   /*
@@ -13,24 +13,32 @@ public class Greedy {
    * - Cuáles son los candidatos.
    *   Los candidatos son las máquinas.
    * - Estrategia de selección de candidatos.
-   *   El critero para elegir los candidatos, es el que tenga mayor capacidad.
+   *   El criterio para elegir los candidatos, es el que tenga mayor capacidad.
    * - Consideraciones respecto a encontrar o no solución.
    *   La consideración que tomamos para ver si se encontró o no la solución
-   *   es que las piezas restantes sean iguales a cero.
+   *   es que las piezas restantes sean iguales a cero o que el metodo seleccionarMaquinas
+   *   no devuelva ningún candidato válido.
    */
-  public ArrayList<Maquina> greedy(ArrayList<Maquina> maquinas) {
+  public Solucion greedy(ArrayList<Maquina> maquinas) {
     Integer piezasRestantes = this.totalPiezasAFabricar;
 
     while (!solucion(piezasRestantes)) {
       Maquina maquinaCandidata = seleccionarMaquinas(maquinas, piezasRestantes); // Criterio greedy
+      if (maquinaCandidata.getCapacidad() == 0) {
+        return null;
+      }
       if (esFactible(maquinaCandidata, piezasRestantes)) {
-        Integer cantidad = piezasRestantes / maquinaCandidata.getCapacidad();
-        S.add(maquinaCandidata);
-        piezasRestantes = piezasRestantes % maquinaCandidata.getCapacidad();
+        solucion.agregarMaquina(maquinaCandidata);
+        solucion.actualizarCantPiezasProducidas(maquinaCandidata.getCapacidad());
+        solucion.actualizarCantidadPuestasFuncionamiento();
+        solucion.actualizarMetrica();
+        piezasRestantes -= maquinaCandidata.getCapacidad();
+      } else {
+        return null;
       }
     }
     if (solucion(piezasRestantes))
-      return S;
+      return solucion;
     else
       return null;
   }
@@ -53,6 +61,4 @@ public class Greedy {
     }
     return mejor;
   }
-
-  // Ordenar los candidatos de mayor a menor
 }
