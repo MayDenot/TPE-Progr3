@@ -2,11 +2,13 @@ import java.util.ArrayList;
 
 public class BackTracking {
   private ArrayList<Maquina> S, estado;
+  private ArrayList<Maquina> solucion;
   private Integer totalPiezasAFabricar;
 
   public BackTracking(Integer totalPiezasAFabricar) {
     this.S = new ArrayList<>();
     this.estado = new ArrayList<>();
+    this.solucion = new ArrayList<>();
     this.totalPiezasAFabricar = totalPiezasAFabricar;
   }
   /*
@@ -19,22 +21,28 @@ public class BackTracking {
     Integer cantPiezasActual = 0;
 
     backTracking(maquinas, cantPiezasActual, solucionActual);
-    return solucionActual;
+
+    return solucion;
   }
 
-  private void backTracking(ArrayList<Maquina> maquinas, Integer cantPiezasActual,
-                            ArrayList<Maquina> solucionActual) {
-    if (cantPiezasActual.equals(totalPiezasAFabricar) && estado.size() < solucionActual.size()) {
-      solucionActual.clear();
-      solucionActual.addAll(estado);
+  private void backTracking(ArrayList<Maquina> maquinas, Integer cantPiezasActual, ArrayList<Maquina> solucionActual) {
+    if (esMejor(solucionActual, solucion, cantPiezasActual)) {
+      this.solucion.clear();
+      this.solucion.addAll(solucionActual);
     } else {
-      for (int i = 0; i < maquinas.size(); i++) {
-        if (cantPiezasActual + maquinas.get(i).getCapacidad() <= totalPiezasAFabricar) {
-          estado.add(maquinas.get(i));
-          backTracking(maquinas, cantPiezasActual + maquinas.get(i).getCapacidad(), solucionActual);
-          estado.remove(estado.size() - 1);
-        }
+      for (Maquina maquina : maquinas) {
+        solucionActual.add(maquina);
+        cantPiezasActual += maquina.getCapacidad();
+
+        backTracking(maquinas, cantPiezasActual, solucionActual);
+
+        solucionActual.removeLast();
+        cantPiezasActual -= maquina.getCapacidad();
       }
     }
+  }
+
+  private boolean esMejor(ArrayList<Maquina> actual, ArrayList<Maquina> mejor, Integer cantPiezasActual) {
+    return mejor.isEmpty() || cantPiezasActual.equals(totalPiezasAFabricar) && actual.size() < mejor.size();
   }
 }
