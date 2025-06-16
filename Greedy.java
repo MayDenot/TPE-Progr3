@@ -53,4 +53,6 @@ public class Greedy {
     }
     return mejor;
   }
+
+  // Ordenar los candidatos de mayor a menor
 }

@@ -1,59 +1,47 @@
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Main {
+  private static final String ARCHIVO_ENTRADA = "Input.txt";
+
   public static void main(String[] args) {
     ArrayList<Maquina> maquinas = new ArrayList<>();
-    Integer totalPiezasAFabricar = 0;
+    int totalPiezasAFabricar = 0;
+    LectorDatos datos = new LectorDatos(totalPiezasAFabricar, maquinas);
 
-    try {
-      BufferedReader bf = new BufferedReader(new FileReader("Input.txt"));
+    datos = datos.cargarDatos();
 
-      // Leer la primera línea: cantidad total de piezas a fabricar
-      String primeraLinea = bf.readLine();
-      totalPiezasAFabricar = Integer.parseInt(primeraLinea.trim());
+    mostrarInformacionInicial(datos);
 
-      // Leer las líneas siguientes: información de las máquinas
-      String linea;
-      while ((linea = bf.readLine()) != null) {
-        // Dividir la línea por la coma
-        String[] partes = linea.split(",");
+    ejecutarAlgoritmos(datos);
+  }
 
-        if (partes.length == 2) {
-          String nombreMaquina = partes[0].trim();
-          int capacidadMaquina = Integer.parseInt(partes[1].trim());
-
-          // Crear nueva máquina y agregarla al ArrayList
-          Maquina maquina = new Maquina(nombreMaquina, capacidadMaquina);
-          maquinas.add(maquina);
-        }
-      }
-
-      bf.close();
-
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
-
-    System.out.println("Total de piezas a fabricar: " + totalPiezasAFabricar);
+  public static void mostrarInformacionInicial(LectorDatos datos) {
+    System.out.println("Total de piezas a fabricar: " + datos.getTotalPiezas());
     System.out.println("Máquinas disponibles:");
-    for (Maquina maquina : maquinas) {
+    for (Maquina maquina : datos.getMaquinas()) {
       System.out.println("  " + maquina);
     }
+  }
 
-    BackTracking back = new BackTracking(totalPiezasAFabricar);
+  public static void ejecutarAlgoritmos(LectorDatos datos) {
+    BackTracking back = new BackTracking(datos.getTotalPiezas());
     System.out.println("Backtracking");
-    System.out.println(back.backTracking(maquinas));
+    System.out.println(back.backTracking(datos.getMaquinas()));
     // FALTA ESTO
     // Solución obtenida: secuencia de máquinas.
     // Solución obtenida: cantidad de piezas producidas y cantidad de puestas en funcionamiento
     // requeridas.
     // Métrica para analizar el costo de la solución (cantidad de estados generados)
 
-    Greedy greedy = new Greedy(totalPiezasAFabricar);
-    System.out.println("Greedy");
-    System.out.println("Solución obtenida: " + greedy.greedy(maquinas));
+    Greedy greedy = new Greedy(datos.getTotalPiezas());
+    System.out.println("Greedy"); // Crear clase Solucion
+    List<Maquina> solucionGreedy = greedy.greedy(datos.getMaquinas());
+    if (solucionGreedy != null) {
+      System.out.println("Solución obtenida: " + solucionGreedy);
+    } else {
+      System.out.println("No hay solución posible");
+    }
     // FALTA ESTO
     // Solución obtenida: cantidad de piezas producidas y cantidad de puestas en funcionamiento
     // requeridas.
