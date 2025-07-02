@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class Greedy {
   private Solucion solucion;
@@ -21,20 +22,21 @@ public class Greedy {
    */
   public Solucion greedy(ArrayList<Maquina> maquinas) {
     Integer piezasRestantes = this.totalPiezasAFabricar;
+    maquinas.sort(Collections.reverseOrder());
 
-    while (!solucion(piezasRestantes)) {
-      Maquina maquinaCandidata = seleccionarMaquinas(maquinas, piezasRestantes); // Criterio greedy
-      if (maquinaCandidata.getCapacidad() == 0) {
-        return null;
-      }
+    while (!solucion(piezasRestantes) && !maquinas.isEmpty()) {
+      Maquina maquinaCandidata = maquinas.getFirst(); // Criterio greedy
+      maquinas.remove(maquinaCandidata);
+
+      solucion.actualizarMetrica();
       if (esFactible(maquinaCandidata, piezasRestantes)) {
-        solucion.agregarMaquina(maquinaCandidata);
-        solucion.actualizarCantPiezasProducidas(maquinaCandidata.getCapacidad());
-        solucion.actualizarCantidadPuestasFuncionamiento();
-        solucion.actualizarMetrica();
-        piezasRestantes -= maquinaCandidata.getCapacidad();
-      } else {
-        return null;
+        int cantidadDeUsos = piezasRestantes / maquinaCandidata.getCapacidad();
+        for (int i = 0; i < cantidadDeUsos; i++) {
+          solucion.agregarMaquina(maquinaCandidata);
+          solucion.actualizarCantPiezasProducidas(maquinaCandidata.getCapacidad());
+          solucion.actualizarCantidadPuestasFuncionamiento();
+          piezasRestantes -= maquinaCandidata.getCapacidad();
+        }
       }
     }
     if (solucion(piezasRestantes))
@@ -49,16 +51,5 @@ public class Greedy {
 
   private boolean solucion(Integer piezasRestantes) {
     return piezasRestantes.equals(0);
-  }
-
-  private Maquina seleccionarMaquinas(ArrayList<Maquina> maquinas, Integer piezasRestantes) {
-    // Seleccionar la máquina con capacidad mayor
-    Maquina mejor = new Maquina("", 0);
-    for (Maquina maquina : maquinas) {
-      if (maquina.getCapacidad() > mejor.getCapacidad() && esFactible(maquina, piezasRestantes)) {
-        mejor = maquina;
-      }
-    }
-    return mejor;
   }
 }

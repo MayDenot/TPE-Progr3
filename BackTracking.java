@@ -20,51 +20,47 @@ public class BackTracking {
    *     (si nos pasamos del total requerido).
    *     Algunos estados solución válidos siguiendo con el mismo ejemplo, serían [M3,M3,M3] o
    *     [M1,M3,M4] o [M2,M2,M2,M2].
-   *   - Posibles podas
-   *      1. Sí nos pasamos del total requerido
-   *      2. Si ya tenemos una solución mejor
+   *   - Posible poda
+   *      1. Si ya tenemos una solución mejor
    */
   public Solucion backTracking(ArrayList<Maquina> maquinas) {
     Solucion solucionActual = new Solucion();
 
-    backTracking(maquinas, 0, solucionActual);
+    backTracking(maquinas, 0, solucionActual,0);
 
     return solucion;
   }
 
-  private void backTracking(ArrayList<Maquina> maquinas, Integer cantPiezasActual, Solucion solucionActual) {
-    solucionActual.actualizarMetrica();
+  private void backTracking(ArrayList<Maquina> maquinas, Integer cantPiezasActual, Solucion solucionActual, int indice) {
+    solucion.actualizarMetrica();
 
     if (cantPiezasActual.equals(totalPiezasAFabricar)) {
       if (esMejor(solucionActual, solucion, cantPiezasActual)) {
         actualizarMejorSolucion(solucionActual);
       }
     } else {
-      // Poda: si nos pasamos del total requerido
-      if (cantPiezasActual > totalPiezasAFabricar) {
-        return;
-      }
+      for (int i = indice; i < maquinas.size(); i++) {
+        // Poda: si ya tenemos una solución mejor
+        if (solucion.estaVacio() || solucionActual.getTamanio() < solucion.getTamanio()) {
+          Maquina maquina = maquinas.get(i);
+          solucionActual.agregarMaquina(maquina);
+          solucionActual.actualizarCantPiezasProducidas(maquina.getCapacidad());
+          solucionActual.actualizarCantidadPuestasFuncionamiento();
+          cantPiezasActual += maquina.getCapacidad();
 
-      // Poda: si ya tenemos una solución mejor
-      if (!solucion.estaVacio() && solucionActual.getTamanio() >= solucion.getTamanio()) {
-        return;
-      }
+          if (cantPiezasActual <= totalPiezasAFabricar) {
+            backTracking(maquinas, cantPiezasActual, solucionActual, i);
+          }
 
-      for (Maquina maquina : maquinas) {
-        solucionActual.agregarMaquina(maquina);
-        solucionActual.actualizarCantPiezasProducidas(maquina.getCapacidad());
-        solucionActual.actualizarCantidadPuestasFuncionamiento();
-        cantPiezasActual += maquina.getCapacidad();
-
-        backTracking(maquinas, cantPiezasActual, solucionActual);
-
-        solucionActual.eliminarUltimo();
-        solucionActual.restarCantPiezasProducidas(maquina.getCapacidad());
-        solucionActual.decrementarPuestasFuncionamiento();
-        cantPiezasActual -= maquina.getCapacidad();
+          solucionActual.eliminarUltimo();
+          solucionActual.restarCantPiezasProducidas(maquina.getCapacidad());
+          solucionActual.decrementarPuestasFuncionamiento();
+          cantPiezasActual -= maquina.getCapacidad();
+        }
       }
     }
   }
+
 
   private void actualizarMejorSolucion(Solucion solucionActual) {
     this.solucion.vaciarSolucion();
@@ -73,7 +69,6 @@ public class BackTracking {
     }
     solucion.setCantPiezasProducidas(solucionActual.getCantPiezasProducidas());
     solucion.setCantidadPuestasFuncionamiento(solucionActual.getCantidadPuestasFuncionamiento());
-    solucion.setMetrica(solucionActual.getMetrica());
   }
 
   private boolean esMejor(Solucion actual, Solucion mejor, Integer cantPiezasActual) {
